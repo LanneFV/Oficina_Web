@@ -1,0 +1,372 @@
+
+:root {
+    --primary-dark: #2a2c41;
+    --primary-gold: #c38d5a;
+    --bg-light: #fdfaf6;
+    --text-dark: #333333;
+    --text-light: #777777;
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Open Sans', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    color: var(--text-dark);
+    line-height: 1.6;
+    background-color: #ffffff;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    color: var(--primary-dark);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- HEADER --- */
+header {
+    background: linear-gradient(to bottom, #eedcba, #f7eee2);
+    padding: 20px 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+}
+
+.logo i {
+    color: var(--primary-gold);
+    font-size: 1.5rem;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* --- HERO SECTION --- */
+.hero {
+    background: linear-gradient(to bottom, #f7eee2, #ffffff);
+    padding: 60px 0;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+}
+
+.hero-text h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.hero-text h1 span {
+    color: var(--primary-gold);
+}
+
+.hero-text > p {
+    color: var(--text-light);
+    margin-bottom: 40px;
+    max-width: 400px;
+}
+
+.appointment-form {
+    background-color: var(--primary-gold);
+    padding: 40px;
+    border-radius: 4px;
+    max-width: 450px;
+}
+
+.appointment-form h3 {
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-family: var(--font-sans);
+    text-align: center;
+    font-size: 1.4rem;
+}
+
+.appointment-form input,
+.appointment-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 2px;
+    font-family: var(--font-sans);
+}
+
+.appointment-form button {
+    width: 100%;
+    background-color: var(--primary-dark);
+    color: #ffffff;
+    border: none;
+    padding: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.hero-image-container {
+    position: relative;
+}
+
+.hero-image-container img {
+    width: 100%;
+    max-width: 400px;
+    display: block;
+    margin: 0 auto;
+}
+
+.testimonial {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.testimonial-author img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author-info strong {
+    display: block;
+    color: var(--primary-dark);
+}
+
+/* --- SERVICES SECTION --- */
+.services {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.section-header {
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.section-header p {
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.service-item i {
+    font-size: 2.5rem;
+    color: var(--primary-gold);
+    margin-bottom: 15px;
+}
+
+.service-item h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.service-item p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* --- TEAM SECTION --- */
+.team {
+    padding: 80px 0;
+    background-color: var(--bg-light);
+    text-align: center;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    text-align: left;
+}
+
+.team-member img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.team-member h4 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.team-member .role {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.team-member p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* --- NEWSLETTER SECTION --- */
+.newsletter {
+    background-color: var(--primary-gold);
+    padding: 60px 0;
+    text-align: center;
+    color: #ffffff;
+}
+
+.newsletter h2 {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.newsletter p {
+    margin-bottom: 30px;
+}
+
+.newsletter-form {
+    display: flex;
+    justify-content: center;
+    max-width: 600px;
+    margin: 0 auto;
+    gap: 10px;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 15px;
+    border: none;
+}
+
+.newsletter-form button {
+    background-color: var(--primary-dark);
+    color: #ffffff;
+    border: none;
+    padding: 0 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* --- FOOTER / CONTACT --- */
+footer {
+    background-color: var(--primary-dark);
+    color: #ffffff;
+    padding: 80px 0 20px;
+    text-align: center;
+}
+
+footer h2 {
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+footer > p {
+    color: #aaaaaa;
+    margin-bottom: 40px;
+    font-size: 0.9rem;
+}
+
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: none;
+    background-color: #ffffff;
+    font-family: var(--font-sans);
+}
+
+.contact-form textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.contact-form button {
+    width: 100%;
+    background-color: var(--primary-gold);
+    color: #ffffff;
+    border: none;
+    padding: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.social-icons {
+    margin-bottom: 40px;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin: 0 10px;
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.copyright {
+    font-size: 0.8rem;
+    color: #777777;
+    border-top: 1px solid #444;
+    padding-top: 20px;
+}
