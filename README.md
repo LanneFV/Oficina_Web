@@ -32,6 +32,50 @@ O sistema foi desenhado para ser rápido e não obstrutivo, operando da seguinte
 
 **Injeção na Tela**: Através de Content Scripts, a extensão manipula o DOM (Document Object Model) da página de forma isolada para não quebrar o site original. O widget do avatar é sobreposto à tela utilizando o controle da propriedade CSS z-index, garantindo que fique sempre visível para o usuário.
 
+# Como Rodar o Servidor (Teste Local do Modelo)
+Atualmente, o servidor está configurado para testar o reconhecimento de voz via microfone antes da implementação completa do WebSocket.
+
+## Pré-requisitos
+- Python 3.8 ou superior.
+
+- Modelo Vosk (pt-BR) baixado e extraído em server/models/.
+
+Baixe e extraia o modelo **vosk-model-small-pt-0.3** em: [alphacephei.com/vosk/models](alphacephei.com/vosk/models)
+
+## Passo a Passo
+
+Acesse a pasta do servidor:
+
+```Bash
+cd server
+```
+Crie um ambiente virtual (venv):
+
+```Bash
+# Windows
+python -m venv venv
+# Linux/Mac
+python3 -m venv venv
+```
+Ative o ambiente virtual:
+
+```Bash
+# Windows
+.\venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+```
+Instale as dependências:
+
+```Bash
+pip install -r requirements.txt
+```
+
+Execute o motor de STT:
+
+```Bash
+python main.py
+```
 # Backlog
 
 O acompanhamento das tarefas é gerenciado através do [Trello](https://trello.com/invite/b/69c27fe35421225b2ffbbba6/ATTI059c6f20c7e09b3e68f6dd8d788097bb9934578C/oficina-web).
