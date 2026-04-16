@@ -9,7 +9,7 @@
     "activeTab"
   ],
   "host_permissions": [
-    "*://*.youtube.com/*"
+    "*<all_urls>*"
   ],
   "background": {
     "service_worker": "background.js"
