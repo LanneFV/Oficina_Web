@@ -21,7 +21,14 @@ function conectarVosk() {
     ws.onopen = () => console.log("Conectado ao Vosk!");
     ws.onmessage = (event) => {
         const resultado = JSON.parse(event.data);
-        if (resultado.text) console.log("Transcrição:", resultado.text);
+        
+        if (resultado.text) {
+            if (resultado.final) {
+                console.log("%c FINAL: " + resultado.text, "color: green; font-weight: bold; font-size: 14px;");
+            } else {
+                console.log("Parcial:", resultado.text);
+            }
+        }
     };
 }
 
@@ -80,10 +87,12 @@ function pararTudo() {
         mediaStream.getTracks().forEach(track => track.stop());
     }
 }
-
 function convertFloat32ToInt16(buffer) {
     let l = buffer.length;
     let buf = new Int16Array(l);
-    while (l--) buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
+    while (l--) {
+        let s = Math.max(-1, Math.min(1, buffer[l]));
+        buf[l] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
     return buf.buffer;
 }
