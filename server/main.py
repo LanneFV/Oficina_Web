@@ -7,12 +7,12 @@ from processor import VoskProcessor
 
 MODEL_PATH = "./models/vosk-model-small-pt-0.3"
 SAMPLE_RATE = 16000
-
 widget_client = None
-pending_queue = []  
+
 
 def timestamp():
     return time.strftime("%H:%M:%S")
+
 
 print(f"[{timestamp()}] Carregando modelo Vosk...")
 engine = VoskProcessor(MODEL_PATH, SAMPLE_RATE)
@@ -20,6 +20,7 @@ engine = VoskProcessor(MODEL_PATH, SAMPLE_RATE)
 
 async def serve_widget(request):
     return web.FileResponse('./widget.html')
+
 
 async def start_http_server():
     app = web.Application()
@@ -30,62 +31,56 @@ async def start_http_server():
     await site.start()
     print(f"[{timestamp()}] Widget em http://localhost:8080/widget.html")
 
+
 async def send_to_widget(text: str):
-    global widget_client, pending_queue
+    global widget_client
     if widget_client is None:
-        pending_queue.append(text)
-        print(f"[{timestamp()}] Widget não conectado — texto enfileirado ({len(pending_queue)} pendentes)")
+        print(f"[{timestamp()}] Widget não conectado")
         return
     try:
         await widget_client.send(json.dumps({"text": text}))
     except Exception as e:
         print(f"[{timestamp()}] Erro ao enviar pro widget: {e}")
         widget_client = None
-        pending_queue.append(text)
 
-async def flush_pending():
-    """Envia todos os textos pendentes assim que o widget conecta."""
-    global widget_client, pending_queue
-    if not pending_queue:
-        return
-    print(f"[{timestamp()}] Enviando {len(pending_queue)} texto(s) pendente(s) ao widget...")
-    for text in list(pending_queue):
-        if widget_client is None:
-            break
-        try:
-            await widget_client.send(json.dumps({"text": text}))
-            pending_queue.pop(0)
-        except Exception as e:
-            print(f"[{timestamp()}] Erro ao liberar fila: {e}")
-            widget_client = None
-            break
 
 async def audio_handler(websocket):
     print(f"[{timestamp()}] Extensão conectada")
     try:
         async for message in websocket:
-            text, is_final = engine.process_chunk(message)
-            if text:
-                if is_final:
-                    print(f"[{timestamp()}] Final: {text}")
-                    await send_to_widget(text)
+            chunk, full_text, is_final = engine.process_chunk(message)
+
+            # Envia ao VLibras assim que tiver um chunk estável
+            if chunk:
+                tag = "Final" if is_final else "Parcial"
+                print(f"[{timestamp()}] {tag} -> VLibras: {chunk}")
+                await send_to_widget(chunk)
+
+            # Continua mandando o texto cheio pra extensão (legenda)
+            if full_text:
                 await websocket.send(json.dumps({
-                    "text": text,
+                    "text": full_text,
                     "final": is_final
                 }))
     except websockets.exceptions.ConnectionClosed:
+        # Recupera o que sobrou no buffer do Vosk
+        chunk, _ = engine.get_final()
+        if chunk:
+            print(f"[{timestamp()}] Resto final -> VLibras: {chunk}")
+            await send_to_widget(chunk)
         print(f"[{timestamp()}] Extensão desconectada")
+
 
 async def widget_handler(websocket):
     global widget_client
     widget_client = websocket
     print(f"[{timestamp()}] Widget conectado")
-    await flush_pending()
     try:
         await websocket.wait_closed()
     finally:
         widget_client = None
         print(f"[{timestamp()}] Widget desconectado")
+
 
 async def main():
     await start_http_server()
@@ -96,6 +91,7 @@ async def main():
         websockets.serve(widget_handler, "localhost", 8766)
     ):
         await asyncio.Future()
-        
+
+
 if __name__ == "__main__":
     asyncio.run(main())
