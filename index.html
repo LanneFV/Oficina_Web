@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faz o L</title>
+<title>Faz o Libras</title>
+<link rel="icon" type="image/x-icon" href="/extension/icons/icon128.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -497,15 +498,38 @@
     opacity: 1;
     transform: none;
   }
+
+  /* VIDEO */
+  .video-section {
+    padding: 100px 48px;
+    border-top: 1px solid var(--border);
+  }
+  .video-wrapper {
+    margin-top: 48px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background: #000;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.1);
+  }
+  .video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
+  }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">Faz o <span>L</span></div>
+  <div class="nav-logo">Faz o <span>Libras</span></div>
   <div class="nav-links">
     <a href="#problema">Problema</a>
+    <a href="#demo">Demo</a>
     <a href="#como-funciona">Como funciona</a>
     <a href="#diferenciais">Diferenciais</a>
     <a href="#instalacao">Instalação</a>
@@ -606,6 +630,22 @@
       <h3>Avatar VLibras Gov</h3>
       <p>Integrado ao player oficial do governo brasileiro — tecnologia validada, mantida e reconhecida institucionalmente.</p>
     </div>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section class="video-section reveal" id="demo">
+  <p class="section-label">Demonstração</p>
+  <h2 class="section-title">Veja o projeto<br><em>em ação.</em></h2>
+  <div class="video-wrapper">
+    <iframe
+      src="https://www.youtube.com/embed/gjCCYhm6paE"
+      title="Demonstração Faz o L — Tradução em Libras em tempo real"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen>
+    </iframe>
   </div>
 </section>
 

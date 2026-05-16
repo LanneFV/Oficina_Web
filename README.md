@@ -1,4 +1,12 @@
 # Extensão Web para Tradução de Libras em Tempo Real
+ 
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![License](https://img.shields.io/badge/license-MIT-green)
+![GitHub repo size](https://img.shields.io/github/repo-size/LanneFV/Oficina_Web)
+![GitHub last commit](https://img.shields.io/github/last-commit/LanneFV/Oficina_Web)
+ 
+
+# Extensão Web para Tradução de Libras em Tempo Real
 Garantindo acessibilidade, autonomia e dignidade através de tradução sintática inteligente em tempo real.
 
 # Sobre o Projeto
@@ -31,16 +39,36 @@ O sistema foi desenhado para ser rápido e não obstrutivo, operando da seguinte
 **Renderização 3D**: O texto processado alimenta o motor do VLibras, que gera a animação do avatar.
 
 **Injeção na Tela**: Através de Content Scripts, a extensão manipula o DOM (Document Object Model) da página de forma isolada para não quebrar o site original. O widget do avatar é sobreposto à tela utilizando o controle da propriedade CSS z-index, garantindo que fique sempre visível para o usuário.
+ 
+```
+Áudio da aba
+     │
+     ▼
+[Tab Capture API] ──► [Pacotes de áudio em ms]
+                              │
+                              ▼ WebSocket
+                      [Servidor de IA]
+                              │
+                    ┌─────────┴──────────┐
+                    ▼                    ▼
+              [Speech-to-Text]      [PLN / Sintaxe LIBRAS]
+                                         │
+                                         ▼
+                                  [Navegador]
+                                         │
+                                         ▼
+                                  [VLibras Avatar 3D]
+                                  (injetado via z-index)
+```
 
 # Como Rodar o Servidor (Teste Local do Modelo)
 Atualmente, o servidor está configurado para testar o reconhecimento de voz via microfone antes da implementação completa do WebSocket.
 
 ## Pré-requisitos
-- Python 3.8 ou superior.
-
-- Modelo Vosk (pt-BR) baixado e extraído em server/models/.
-
-Baixe e extraia o modelo **vosk-model-small-pt-0.3** em: [alphacephei.com/vosk/models](alphacephei.com/vosk/models)
+- Google Chrome (versão 88+)
+- Python 3.8 ou superior
+- Modelo Vosk (pt-BR): baixe e extraia o **vosk-model-small-pt-0.3** em `server/models/`
+  - Download: [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models)
 
 ## Passo a Passo
 
@@ -76,24 +104,31 @@ Execute o motor de STT:
 ```Bash
 python main.py
 ```
+
+### Carregar a Extensão no Chrome
+ 
+1. Abra `chrome://extensions` no navegador
+2. Ative o **Modo do desenvolvedor** (toggle no canto superior direito)
+3. Clique em **"Carregar sem compactação"**
+4. Selecione a pasta `/extension` do repositório clonado
+5. A extensão aparecerá na barra de ferramentas do Chrome ✅
+
+
 # Backlog
 
-O acompanhamento das tarefas é gerenciado através do [Trello](https://trello.com/invite/b/69c27fe35421225b2ffbbba6/ATTI059c6f20c7e09b3e68f6dd8d788097bb9934578C/oficina-web).
+O acompanhamento das tarefas é gerenciado no **Trello** — solicite acesso à equipe.
 
 # Equipe
-- Elane Ferreira Viana: Product Owner
-  
-- Yuri Estrela Leal: Scrum Master
-  
-- Igor Caldeira Andrade: Desenvolvedor
-  
-- Arthur Choi Braga: Desenvolvedor
-  
-- Bianca de Araújo Santana: Desenvolvedora
-  
-- Bruna Pereira da Cunha: Desenvolvedora
-  
-- Luiz Eduardo de Sales Carneiro: Desenvolvedor
+| Nome | Papel |
+|---|---|
+| Elane Ferreira Viana | Product Owner |
+| Yuri Estrela Leal | Scrum Master |
+| Igor Caldeira Andrade | Desenvolvedor |
+| Arthur Choi Braga | Desenvolvedor |
+| Bianca de Araújo Santana | Desenvolvedora |
+| Bruna Pereira da Cunha | Desenvolvedora |
+| Luiz Eduardo de Sales Carneiro | Desenvolvedor |
+
 
 # Tecnologias Envolvidas
 **Frontend / Extensão**: JavaScript (DOM Manipulation, Content Scripts), HTML, CSS (z-index management).
@@ -110,3 +145,7 @@ O acompanhamento das tarefas é gerenciado através do [Trello](https://trello.c
 Apesar dos avanços nas leis e na conscientização, a inclusão de pessoas com deficiência enfrenta desafios diários. O acesso limitado a tecnologias assistivas (seja por custo ou falta de conhecimento) e a pouca disseminação da LIBRAS nas escolas impactam diretamente a autonomia e a participação social.
 
 Este projeto é um investimento em acessibilidade digital gratuita ou de fácil acesso. Nossa missão é entregar uma ferramenta que promova inclusão plena e efetiva, devolvendo a independência e a qualidade de vida aos indivíduos surdos na internet.
+
+# Licença
+ 
+Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
