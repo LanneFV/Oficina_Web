@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Tradutor Vosk YouTube",
+  "name": "Faz o Libras",
   "version": "1.0",
   "description": "Captura áudio da aba atual para transcrição e tradução em Libras.",
+  "icons": {
+   "16": "icon16.png",
+   "32": "icon32.png",
+   "48": "icon48.png",
+   "128": "icon128.png"
+ }
   "permissions": [
     "tabCapture",
     "offscreen",
@@ -17,7 +23,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Tradutor Vosk"
+    "default_title": "Faz o Libras"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
