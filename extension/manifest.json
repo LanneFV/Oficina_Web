@@ -4,11 +4,11 @@
   "version": "1.0",
   "description": "Captura áudio da aba atual para transcrição e tradução em Libras.",
   "icons": {
-   "16": "icons/icon16.png",
-   "32": "icons/icon32.png",
-   "48": "icons/icon48.png",
-   "128": "icons/icon128.png"
- }
+   "16": "icons/icon16.jpeg",
+   "32": "icons/icon32.jpeg",
+   "48": "icons/icon48.jpeg",
+   "128": "icons/icon128.jpeg"
+ },
   "permissions": [
     "tabCapture",
     "offscreen",
