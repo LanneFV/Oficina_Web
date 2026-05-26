@@ -9,7 +9,7 @@ MODEL_PATH = "./models/vosk-model-small-pt-0.3"
 SAMPLE_RATE = 16000
 
 widget_client = None
-pending_queue = []  
+pending_queue = []  # textos aguardando o widget conectar
 
 def timestamp():
     return time.strftime("%H:%M:%S")
@@ -19,7 +19,15 @@ engine = VoskProcessor(MODEL_PATH, SAMPLE_RATE)
 
 
 async def serve_widget(request):
-    return web.FileResponse('./widget.html')
+    with open('./widget.html', 'r', encoding='utf-8') as f:
+        html = f.read()
+    return web.Response(
+        text=html,
+        content_type='text/html',
+        headers={
+            'Content-Security-Policy': "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        }
+    )
 
 async def start_http_server():
     app = web.Application()

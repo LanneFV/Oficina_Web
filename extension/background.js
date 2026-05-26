@@ -18,8 +18,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 async function iniciarCapturaDaAba() {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab) return;
+    // Busca a aba ativa que seja uma página normal (não chrome:// ou extensão)
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = tabs.find(t => t.url && t.url.startsWith('http'));
+    if (!tab) {
+        // Fallback: busca a aba http mais recente em qualquer janela
+        const allTabs = await chrome.tabs.query({ currentWindow: false });
+        const httpTab = allTabs.filter(t => t.url && t.url.startsWith('http')).pop();
+        if (!httpTab) { console.error('Nenhuma aba de vídeo encontrada'); return; }
+        return iniciarCapturaNaAba(httpTab);
+    }
+    return iniciarCapturaNaAba(tab);
+}
+
+async function iniciarCapturaNaAba(tab) {
 
     const offscreenUrl = chrome.runtime.getURL('offscreen.html');
     const existingContexts = await chrome.runtime.getContexts({

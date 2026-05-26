@@ -3,182 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <title>VLibras</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-
-      html, body {
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        background: #F8FAFC;
-        font-family: 'DM Sans', sans-serif;
-      }
-
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #EEF2FF; }
       [vw] {
         position: fixed !important;
         top: 0 !important; left: 0 !important;
         right: 0 !important; bottom: 0 !important;
         transform: none !important;
-        width: 100vw !important;
-        height: 100vh !important;
+        width: 100% !important; height: 100% !important;
       }
       [vw-access-button] { display: none !important; }
       [vw] [vw-plugin-wrapper] {
         position: fixed !important;
         top: 0 !important; left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        float: none !important;
-        border-radius: 0 !important;
+        width: 100% !important; height: 100% !important;
+        float: none !important; border-radius: 0 !important;
       }
-      [vp] .vpw-box,
-      [vp] .vpw-controls { border-radius: 0 !important; }
+      [vp] .vpw-box, [vp] .vpw-controls { border-radius: 0 !important; }
 
+      /* Esconde sidebar lateral do VLibras */
+      .vpw-settings-btn-wrapper,
+      .vpw-settings-btn,
+      [class*="vpw-settings-btn"],
+      .vw-plugin-top-wrapper > *,
+      [vw-plugin-top-wrapper] > * { display: none !important; }
       #vlibras-target {
-        position: fixed;
-        top: 50%; left: 50%;
+        position: fixed; top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        color: transparent;
-        pointer-events: all;
-        user-select: text;
-        font-size: 18px;
-      }
-
-      #frase-bar {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        z-index: 9998;
-        padding: 0 16px 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        pointer-events: none;
-      }
-
-      #proxima-frase {
-        font-size: 13px;
-        color: rgba(255,255,255,0.55);
-        background: rgba(0,0,0,0.35);
-        border-radius: 8px;
-        padding: 5px 12px;
-        align-self: flex-start;
-        max-width: 90%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: none;
-      }
-      #proxima-label {
-        font-size: 10px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: rgba(255,255,255,0.4);
-        margin-right: 6px;
-      }
-
-      #frase-atual {
-        background: rgba(0,0,0,0.72);
-        border-radius: 12px;
-        padding: 12px 16px;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-      }
-      #frase-atual-texto {
-        font-size: 16px;
-        font-weight: 500;
-        color: #fff;
-        line-height: 1.5;
-        flex: 1;
-        word-break: break-word;
-      }
-      #frase-atual-texto.idle {
-        font-size: 14px;
-        font-weight: 400;
-        color: rgba(255,255,255,0.4);
-        font-style: italic;
-      }
-      .bars {
-        display: flex; gap: 2px; align-items: flex-end;
-        height: 16px; flex-shrink: 0; margin-top: 3px;
-      }
-      .bars span {
-        width: 3px; background: #60A5FA;
-        border-radius: 2px;
-        animation: bar 0.8s ease-in-out infinite;
-      }
-      .bars span:nth-child(2) { animation-delay: 0.15s; }
-      .bars span:nth-child(3) { animation-delay: 0.30s; }
-      @keyframes bar { 0%,100%{ height:3px } 50%{ height:14px } }
-      .bars.hidden { display: none; }
-
-      #status-badge {
-        position: fixed;
-        top: 12px; right: 12px;
-        z-index: 9999;
-        background: rgba(0,0,0,0.55);
-        border-radius: 999px;
-        padding: 4px 10px 4px 8px;
-        display: flex; align-items: center; gap: 6px;
-        font-size: 11px; font-weight: 500;
-        color: rgba(255,255,255,0.7);
-        pointer-events: none;
-      }
-      .status-dot {
-        width: 6px; height: 6px;
-        border-radius: 50%;
-        background: #6B7280;
-        flex-shrink: 0;
-      }
-      .status-dot.on  { background: #4ADE80; }
-      .status-dot.off { background: #F87171; }
-
-      #fila-badge {
-        position: fixed;
-        top: 12px; left: 12px;
-        z-index: 9999;
-        background: rgba(0,0,0,0.55);
-        border-radius: 999px;
-        padding: 4px 10px;
-        font-size: 11px; font-weight: 500;
-        color: rgba(255,255,255,0.6);
-        display: none;
-        pointer-events: none;
+        color: transparent; pointer-events: all;
+        user-select: text; font-size: 18px;
       }
     </style>
   </head>
   <body>
-
     <span id="vlibras-target"> </span>
-
     <div vw class="enabled">
       <div vw-access-button class="active"></div>
       <div vw-plugin-wrapper>
         <div class="vw-plugin-top-wrapper"></div>
-      </div>
-    </div>
-
-    <div id="status-badge">
-      <span class="status-dot off" id="status-dot"></span>
-      <span id="status-text">Offline</span>
-    </div>
-
-    <div id="fila-badge" id="fila-badge"></div>
-
-    <div id="frase-bar">
-      <div id="proxima-frase">
-        <span id="proxima-label">A seguir</span>
-        <span id="proxima-texto"></span>
-      </div>
-      <div id="frase-atual">
-        <div class="bars hidden" id="bars">
-          <span></span><span></span><span></span>
-        </div>
-        <span class="idle" id="frase-atual-texto">Aguardando tradução...</span>
       </div>
     </div>
 
@@ -191,52 +54,26 @@
         else setTimeout(tryClick, 200);
       }
       setTimeout(tryClick, 500);
+
+      // Esconde sidebar após o VLibras carregar
+      function hideSidebar() {
+        // Pega todos os filhos diretos do plugin-top-wrapper e esconde
+        const wrapper = document.querySelector('.vw-plugin-top-wrapper');
+        if (wrapper) {
+          wrapper.style.display = 'none';
+        }
+        // Tenta esconder botoes flutuantes
+        document.querySelectorAll('[class*="vpw-btn"], [class*="vpw-settings"], [class*="vpw-sidebar"]').forEach(el => {
+          el.style.display = 'none';
+        });
+      }
+      setTimeout(hideSidebar, 2000);
+      setTimeout(hideSidebar, 4000);
     </script>
 
     <script>
       const ws = new WebSocket("ws://localhost:8766");
       const queue = [];
-
-      const statusDot      = document.getElementById("status-dot");
-      const statusText     = document.getElementById("status-text");
-      const filaBadge      = document.getElementById("fila-badge");
-      const bars           = document.getElementById("bars");
-      const fraseAtualEl   = document.getElementById("frase-atual-texto");
-      const proximaFrase   = document.getElementById("proxima-frase");
-      const proximaTexto   = document.getElementById("proxima-texto");
-
-      function setConn(ok) {
-        statusDot.className = "status-dot " + (ok ? "on" : "off");
-        statusText.textContent = ok ? "Online" : "Offline";
-      }
-
-      function updateUI() {
-        // fila badge
-        if (queue.length > 0) {
-          filaBadge.style.display = "block";
-          filaBadge.textContent = queue.length + " na fila";
-        } else {
-          filaBadge.style.display = "none";
-        }
-        if (queue.length > 0) {
-          proximaFrase.style.display = "block";
-          proximaTexto.textContent = queue[0];
-        } else {
-          proximaFrase.style.display = "none";
-        }
-      }
-
-      function setPlaying(text) {
-        fraseAtualEl.textContent = text;
-        fraseAtualEl.classList.remove("idle");
-        bars.classList.remove("hidden");
-      }
-
-      function setIdle() {
-        fraseAtualEl.textContent = "Aguardando tradução...";
-        fraseAtualEl.classList.add("idle");
-        bars.classList.add("hidden");
-      }
 
       function isAnimating() {
         const controls = document.querySelector("[vp-controls]");
@@ -247,8 +84,6 @@
       function processQueue() {
         if (queue.length === 0 || isAnimating()) return;
         const text = queue.shift();
-        updateUI();
-        setPlaying(text);
         const el = document.getElementById("vlibras-target");
         el.textContent = text;
         const range = document.createRange();
@@ -260,13 +95,7 @@
       }
 
       const observer = new MutationObserver(() => {
-        if (!isAnimating()) {
-          if (queue.length > 0) {
-            setTimeout(processQueue, 300);
-          } else {
-            setIdle();
-          }
-        }
+        if (!isAnimating() && queue.length > 0) setTimeout(processQueue, 300);
       });
 
       function startObserver() {
@@ -280,20 +109,13 @@
       setTimeout(startObserver, 2000);
 
       setInterval(() => {
-        if (!isAnimating() && queue.length > 0) {
-          processQueue();
-        }
+        if (!isAnimating() && queue.length > 0) processQueue();
       }, 1000);
-
-      ws.onopen  = () => { setConn(true);  };
-      ws.onerror = () => { setConn(false); };
-      ws.onclose = () => { setConn(false); setIdle(); };
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (!data.text) return;
         queue.push(data.text);
-        updateUI();
         processQueue();
       };
     </script>
