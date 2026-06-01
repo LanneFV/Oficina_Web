@@ -105,6 +105,47 @@ Execute o motor de STT:
 python main.py
 ```
 
+## Gerar Executável (sem Python instalado)
+
+Para rodar o servidor em uma máquina sem Python (ex: totem de evento), gere um executável com PyInstaller. **Execute na mesma plataforma do destino** (Windows → gera `.exe`, Linux → gera binário Linux).
+
+Extraia o modelo (só precisa fazer uma vez):
+
+```bash
+cd server/models
+unzip vosk-model-small-pt-0.3.zip
+cd ..
+```
+
+Instale o PyInstaller e gere o executável:
+
+```bash
+# Ative o venv antes
+pip install pyinstaller
+
+# Linux / Mac
+pyinstaller --onedir \
+  --name "servidor-libras" \
+  --collect-all vosk \
+  --collect-all aiohttp \
+  --add-data "models/vosk-model-small-pt-0.3:models/vosk-model-small-pt-0.3" \
+  --add-data "widget.html:." \
+  main.py
+
+# Windows (separador é ; em vez de :)
+pyinstaller --onedir ^
+  --name "servidor-libras" ^
+  --collect-all vosk ^
+  --collect-all aiohttp ^
+  --add-data "models/vosk-model-small-pt-0.3;models/vosk-model-small-pt-0.3" ^
+  --add-data "widget.html;." ^
+  main.py
+```
+
+O resultado fica em `server/dist/servidor-libras/`. Copie essa pasta para a máquina de destino e execute `servidor-libras` (ou `servidor-libras.exe` no Windows).
+
+> **Atenção:** o `widget.html` carrega o VLibras de `vlibras.gov.br` — a máquina precisa ter acesso à internet.
+
 ### Carregar a Extensão no Chrome
  
 1. Abra `chrome://extensions` no navegador
