@@ -2,10 +2,15 @@ import asyncio
 import websockets
 import json
 import time
+import os
+import sys
+import socket
 from aiohttp import web
 from processor import VoskProcessor
 
-MODEL_PATH = "./models/vosk-model-small-pt-0.3"
+
+_BASE = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(_BASE, "models", "vosk-model-small-pt-0.3")
 SAMPLE_RATE = 16000
 
 widget_client = None
@@ -14,12 +19,23 @@ pending_queue = []  # textos aguardando o widget conectar
 def timestamp():
     return time.strftime("%H:%M:%S")
 
+def check_ports(*ports):
+    taken = []
+    for port in ports:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex(('localhost', port)) == 0:
+                taken.append(port)
+    if taken:
+        print(f"ERRO: porta(s) já em uso: {taken}")
+        print("Feche o processo que está usando essa(s) porta(s) e tente novamente.")
+        sys.exit(1)
+
 print(f"[{timestamp()}] Carregando modelo Vosk...")
 engine = VoskProcessor(MODEL_PATH, SAMPLE_RATE)
 
 
 async def serve_widget(request):
-    with open('./widget.html', 'r', encoding='utf-8') as f:
+    with open(os.path.join(_BASE, 'widget.html'), 'r', encoding='utf-8') as f:
         html = f.read()
     return web.Response(
         text=html,
@@ -96,6 +112,7 @@ async def widget_handler(websocket):
         print(f"[{timestamp()}] Widget desconectado")
 
 async def main():
+    check_ports(8080, 8765, 8766)
     await start_http_server()
     print(f"[{timestamp()}] Áudio em ws://localhost:8765")
     print(f"[{timestamp()}] Widget WS em ws://localhost:8766")

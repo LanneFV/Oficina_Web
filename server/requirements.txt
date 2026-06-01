@@ -1,3 +1,4 @@
 vosk
 sounddevice
 aiohttp
+pyinstaller
