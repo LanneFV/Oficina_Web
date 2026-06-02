@@ -19,20 +19,33 @@
         top: 0 !important; left: 0 !important;
         width: 100% !important; height: 100% !important;
         float: none !important; border-radius: 0 !important;
+        background: transparent !important;
       }
       [vp] .vpw-box, [vp] .vpw-controls { border-radius: 0 !important; }
 
-      /* Esconde sidebar lateral do VLibras */
+      /* Hide VLibras chrome — selectors from actual injected DOM */
+      .vpw-mes,
+      [settings-btn],
+      .vw-plugin-top-wrapper,
       .vpw-settings-btn-wrapper,
-      .vpw-settings-btn,
-      [class*="vpw-settings-btn"],
-      .vw-plugin-top-wrapper > *,
-      [vw-plugin-top-wrapper] > * { display: none !important; }
+      [vp-rate-box],
+      [vp-main-guide-screen],
+      [vp-message-box],
+      [vp-settings-btn],
+      [vp-suggestion-button],
+      [vp-info-screen],
+      [vp-settings],
+      [vp-dictionary],
+      [vp-suggestion-screen],
+      [vp-translator-screen],
+      [vp-more-options-screen],
+      [vp-emotions-tooltip] { display: none !important; }
       #vlibras-target {
         position: fixed; top: 50%; left: 50%;
         transform: translate(-50%, -50%);
         color: transparent; pointer-events: all;
         user-select: text; font-size: 18px;
+        display: none;
       }
     </style>
   </head>
@@ -55,23 +68,39 @@
       }
       setTimeout(tryClick, 500);
 
-      // Esconde sidebar após o VLibras carregar
+      const _HIDE_SELECTORS = [
+        '.vpw-mes', '[settings-btn]', '.vw-plugin-top-wrapper', '.vpw-settings-btn-wrapper',
+        '[vp-rate-box]', '[vp-main-guide-screen]', '[vp-message-box]',
+        '[vp-settings-btn]', '[vp-suggestion-button]', '[vp-info-screen]',
+        '[vp-settings]', '[vp-dictionary]', '[vp-suggestion-screen]',
+        '[vp-translator-screen]', '[vp-more-options-screen]', '[vp-emotions-tooltip]',
+        '[vp-change-avatar]', '[vp-aux-controls]',
+      ].join(',');
+
       function hideSidebar() {
-        // Pega todos os filhos diretos do plugin-top-wrapper e esconde
-        const wrapper = document.querySelector('.vw-plugin-top-wrapper');
-        if (wrapper) {
-          wrapper.style.display = 'none';
-        }
-        // Tenta esconder botoes flutuantes
-        document.querySelectorAll('[class*="vpw-btn"], [class*="vpw-settings"], [class*="vpw-sidebar"]').forEach(el => {
-          el.style.display = 'none';
+        document.querySelectorAll(_HIDE_SELECTORS).forEach(el => {
+          el.style.setProperty('display', 'none', 'important');
         });
+        // Override VLibras's @media width: 210px !important via inline style (beats any stylesheet rule)
+        const wrapper = document.querySelector('[vw-plugin-wrapper]');
+        if (wrapper) {
+          wrapper.style.setProperty('width', '100%', 'important');
+          wrapper.style.setProperty('height', '100%', 'important');
+          wrapper.style.setProperty('max-width', 'none', 'important');
+          wrapper.style.setProperty('min-height', '0', 'important');
+          wrapper.style.setProperty('background', 'transparent', 'important');
+        }
       }
-      setTimeout(hideSidebar, 2000);
-      setTimeout(hideSidebar, 4000);
+
+      // Runs a few times while VLibras loads, then watches for late-injected elements
+      [500, 1500, 3000, 5000].forEach(t => setTimeout(hideSidebar, t));
+      const _uiHider = new MutationObserver(hideSidebar);
+      _uiHider.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => _uiHider.disconnect(), 12000);
     </script>
 
     <script>
+      // Widget owns the queue — it is the only one that knows when an animation finishes.
       const ws = new WebSocket("ws://localhost:8766");
       const queue = [];
 
@@ -92,10 +121,14 @@
         sel.removeAllRanges();
         sel.addRange(range);
         el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        window.parent.postMessage({ type: 'TRADUZINDO', text }, '*');
       }
 
       const observer = new MutationObserver(() => {
-        if (!isAnimating() && queue.length > 0) setTimeout(processQueue, 300);
+        if (!isAnimating()) {
+          if (queue.length > 0) setTimeout(processQueue, 300);
+          else window.parent.postMessage({ type: 'ANIMACAO_FIM' }, '*');
+        }
       });
 
       function startObserver() {

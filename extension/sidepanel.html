@@ -70,21 +70,19 @@
     /* ── Avatar iframe ── */
     .avatar-wrap {
       flex-shrink: 0;
-      height: 420px;
+      height: clamp(220px, 42vh, 400px);
       background: #E8EEFF;
       border-bottom: 1px solid var(--gray-200);
       position: relative;
       overflow: hidden;
     }
     .avatar-wrap iframe {
-      width: 460px;
-      height: 500px;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100% !important;
+      height: 100% !important;
       border: none;
       display: block;
-      transform: scale(0.99);
-      transform-origin: right;
-      position: absolute;
-      top: 0; left: 75px;
     }
     .avatar-placeholder {
       position: absolute;
@@ -192,9 +190,9 @@
     }
 
     /* ── Controls ── */
-    .controls { display: flex; gap: 8px; padding: 10px 12px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
     .btn {
-      flex: 1; padding: 8px 10px;
+      flex: 1; min-width: 80px; padding: 8px 10px;
       border-radius: var(--radius-md);
       font-family: 'DM Sans', sans-serif;
       font-size: 13px; font-weight: 500;
@@ -237,6 +235,8 @@
       display: flex; align-items: center; gap: 5px;
       border-top: 1px solid var(--gray-200);
       flex-shrink: 0;
+      overflow: hidden;
+      white-space: nowrap;
     }
   </style>
 </head>
