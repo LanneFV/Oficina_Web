@@ -112,6 +112,7 @@
 
       function processQueue() {
         if (queue.length === 0 || isAnimating()) return;
+        window.parent.postMessage({ type: 'ANIMACAO_FIM' }, '*');
         const text = queue.shift();
         const el = document.getElementById("vlibras-target");
         el.textContent = text;
@@ -123,23 +124,6 @@
         el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
         window.parent.postMessage({ type: 'TRADUZINDO', text }, '*');
       }
-
-      const observer = new MutationObserver(() => {
-        if (!isAnimating()) {
-          if (queue.length > 0) setTimeout(processQueue, 300);
-          else window.parent.postMessage({ type: 'ANIMACAO_FIM' }, '*');
-        }
-      });
-
-      function startObserver() {
-        const controls = document.querySelector("[vp-controls]");
-        if (controls) {
-          observer.observe(controls, { attributes: true, attributeFilter: ["class"] });
-        } else {
-          setTimeout(startObserver, 500);
-        }
-      }
-      setTimeout(startObserver, 2000);
 
       setInterval(() => {
         if (!isAnimating() && queue.length > 0) processQueue();

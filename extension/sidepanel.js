@@ -1,7 +1,8 @@
 // ── Estado ──────────────────────────────────────────────
-const queue = [];
+const queue = [];       // pending items (display only — widget owns playback)
 let paused = false;
 let listening = false;
+let currentlyPlaying = null;
 let wsVlibras = null;
 let iframeReady = false;
 let avatarIframe = null;
@@ -51,14 +52,17 @@ function enviarParaAvatar(text) {
     avatarIframe.contentWindow.postMessage({ type: 'TRADUZIR', text }, '*');
 }
 
-// Escuta quando o avatar termina a animação
+// Widget.html is the source of truth — it signals us via postMessage.
 window.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'ANIMACAO_FIM') {
-        if (!paused && queue.length > 0) {
-            setTimeout(processQueue, 300);
-        } else if (queue.length === 0) {
-            setIdle();
-        }
+    if (!event.data) return;
+    if (event.data.type === 'TRADUZINDO') {
+        currentlyPlaying = event.data.text;
+        const idx = queue.indexOf(event.data.text);
+        if (idx !== -1) { queue.splice(idx, 1); renderQueue(); }
+        setPlaying(event.data.text);
+    } else if (event.data.type === 'ANIMACAO_FIM') {
+        currentlyPlaying = null;
+        if (queue.length === 0) setIdle();
     }
 });
 
@@ -129,23 +133,16 @@ function setIdle() {
 
 // ── Fila ──────────────────────────────────────────────────
 function enqueue(text) {
+    if (text === currentlyPlaying) return;         // already on screen
+    if (queue[queue.length - 1] === text) return;  // consecutive duplicate from two sources
     queue.push(text);
     renderQueue();
-    if (!paused) processQueue();
-}
-
-function processQueue() {
-    if (queue.length === 0) { setIdle(); return; }
-    const text = queue.shift();
-    renderQueue();
-    setPlaying(text);
-    enviarParaAvatar(text);
 }
 
 function removeItem(index) {
     queue.splice(index, 1);
     renderQueue();
-    if (queue.length === 0) setIdle();
+    if (queue.length === 0 && !currentlyPlaying) setIdle();
 }
 
 // ── Controles ─────────────────────────────────────────────
@@ -162,12 +159,13 @@ function togglePause() {
         pauseIcon.className = 'ti ti-player-pause';
         pauseLabel.textContent = 'Pausar';
         bars.style.opacity = '1';
-        processQueue();
+        statusMsg.textContent = currentlyPlaying ? `Traduzindo · ${queue.length} na fila` : 'Parado';
     }
 }
 
 function clearQueue() {
     queue.length = 0;
+    currentlyPlaying = null;
     renderQueue();
     setIdle();
 }
