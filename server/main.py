@@ -16,8 +16,10 @@ SAMPLE_RATE = 16000
 widget_client = None
 pending_queue = []  # textos aguardando o widget conectar
 
+
 def timestamp():
     return time.strftime("%H:%M:%S")
+
 
 def check_ports(*ports):
     taken = []
@@ -29,6 +31,7 @@ def check_ports(*ports):
         print(f"ERRO: porta(s) já em uso: {taken}")
         print("Feche o processo que está usando essa(s) porta(s) e tente novamente.")
         sys.exit(1)
+
 
 print(f"[{timestamp()}] Carregando modelo Vosk...")
 engine = VoskProcessor(MODEL_PATH, SAMPLE_RATE)
@@ -45,6 +48,7 @@ async def serve_widget(request):
         }
     )
 
+
 async def start_http_server():
     app = web.Application()
     app.router.add_get('/widget.html', serve_widget)
@@ -54,11 +58,13 @@ async def start_http_server():
     await site.start()
     print(f"[{timestamp()}] Widget em http://localhost:8080/widget.html")
 
+
 async def send_to_widget(text: str):
     global widget_client, pending_queue
     if widget_client is None:
         pending_queue.append(text)
-        print(f"[{timestamp()}] Widget não conectado — texto enfileirado ({len(pending_queue)} pendentes)")
+        print(
+            f"[{timestamp()}] Widget não conectado — texto enfileirado ({len(pending_queue)} pendentes)")
         return
     try:
         await widget_client.send(json.dumps({"text": text}))
@@ -66,6 +72,7 @@ async def send_to_widget(text: str):
         print(f"[{timestamp()}] Erro ao enviar pro widget: {e}")
         widget_client = None
         pending_queue.append(text)
+
 
 async def flush_pending():
     """Envia todos os textos pendentes assim que o widget conecta."""
@@ -84,21 +91,65 @@ async def flush_pending():
             widget_client = None
             break
 
+
 async def audio_handler(websocket):
     print(f"[{timestamp()}] Extensão conectada")
+
+    # --- Chunking Configuration ---
+    CHUNK_SIZE = 8   # How many words to send to VLibras at a time
+    # How many words at the end of the sentence to hold back (volatility buffer)
+    BUFFER_SIZE = 4
+    last_sent_index = 0
+
     try:
         async for message in websocket:
             text, is_final = engine.process_chunk(message)
+
             if text:
+                words = text.split()
+
                 if is_final:
                     print(f"[{timestamp()}] Final: {text}")
-                    await send_to_widget(text)
-                await websocket.send(json.dumps({
-                    "text": text,
-                    "final": is_final
-                }))
+
+                    # Send whatever words are left over that haven't been sent yet
+                    remaining_words = words[last_sent_index:]
+                    if remaining_words:
+                        chunk_text = " ".join(remaining_words)
+                        await send_to_widget(chunk_text)
+
+                    # Reset the index for the next sentence
+                    last_sent_index = 0
+
+                    await websocket.send(json.dumps({
+                        "text": text,
+                        "final": True
+                    }))
+                else:
+                    # Calculate how many words are "stable" by ignoring the buffer at the end
+                    stable_words_count = max(0, len(words) - BUFFER_SIZE)
+
+                    # If we have accumulated enough stable words, send a chunk
+                    while stable_words_count - last_sent_index >= CHUNK_SIZE:
+                        # Extract the next batch of words
+                        chunk_words = words[last_sent_index: last_sent_index + CHUNK_SIZE]
+                        chunk_text = " ".join(chunk_words)
+
+                        print(
+                            f"[{timestamp()}] Enviando chunk parcial: {chunk_text}...")
+                        await send_to_widget(chunk_text)
+
+                        # Move our index forward
+                        last_sent_index += CHUNK_SIZE
+
+                    # Still send the raw partial text back to the extension so it knows we are listening
+                    await websocket.send(json.dumps({
+                        "text": text,
+                        "final": False
+                    }))
+
     except websockets.exceptions.ConnectionClosed:
         print(f"[{timestamp()}] Extensão desconectada")
+
 
 async def widget_handler(websocket):
     global widget_client
@@ -111,6 +162,7 @@ async def widget_handler(websocket):
         widget_client = None
         print(f"[{timestamp()}] Widget desconectado")
 
+
 async def main():
     check_ports(8080, 8765, 8766)
     await start_http_server()
@@ -121,6 +173,6 @@ async def main():
         websockets.serve(widget_handler, "localhost", 8766)
     ):
         await asyncio.Future()
-        
+
 if __name__ == "__main__":
     asyncio.run(main())
