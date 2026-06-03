@@ -1,753 +1,1091 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faz o Libras</title>
-<link rel="icon" type="image/x-icon" href="/extension/icons/icon128.jpeg">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LibrasLive</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  :root {
-    --black: #0e0e0e;
-    --white: #f5f4f0;
-    --accent: #7c3aed;
-    --accent-light: #ede9fe;
-    --mid: #6b6b6b;
-    --border: #d8d6d0;
-    --serif: 'DM Serif Display', Georgia, serif;
-    --sans: 'DM Sans', sans-serif;
-  }
-  
+    :root {
+      --black: #0e0e0e;
+      --white: #f5f4f0;
+      --accent: #6B21A8;
+      --accent-dark: #4C1D95;
+      --accent-light: #EDE9FE;
+      --mid: #6b6b6b;
+      --border: #d8d6d0;
+      --serif: \'DM Serif Display\', Georgia, serif;
+      --sans: \'DM Sans\', sans-serif;
+    }
 
-  html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  body {
-    background: var(--white);
-    color: var(--black);
-    font-family: var(--sans);
-    font-weight: 300;
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
+    body {
+      background: #fff;
+      color: var(--black);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 48px;
-    background: rgba(245,244,240,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    font-family: var(--serif);
-    font-size: 18px;
-    letter-spacing: -0.3px;
-  }
-  .nav-logo span { color: var(--accent); font-style: italic; }
-  .nav-links { display: flex; gap: 32px; }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--mid);
-    font-size: 14px;
-    font-weight: 400;
-    transition: color .2s;
-  }
-  .nav-links a:hover { color: var(--black); }
-  .nav-cta {
-    background: var(--black);
-    color: var(--white) !important;
-    padding: 8px 20px;
-    border-radius: 100px;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    transition: background .2s !important;
-  }
-  .nav-cta:hover { background: var(--accent) !important; color: var(--white) !important; }
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
 
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 120px 48px 80px;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute; top: -200px; right: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(26,92,64,0.07) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero-eyebrow {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 24px;
-    opacity: 0;
-    animation: fadeUp .8s ease forwards .1s;
-  }
-  .hero h1 {
-    font-family: var(--serif);
-    font-size: clamp(52px, 7vw, 96px);
-    line-height: 1.02;
-    letter-spacing: -2px;
-    max-width: 800px;
-    margin-bottom: 32px;
-    opacity: 0;
-    animation: fadeUp .8s ease forwards .25s;
-  }
-  .hero h1 em { font-style: italic; color: var(--accent); }
-  .hero-sub {
-    font-size: 18px;
-    color: var(--mid);
-    max-width: 520px;
-    line-height: 1.7;
-    margin-bottom: 48px;
-    opacity: 0;
-    animation: fadeUp .8s ease forwards .4s;
-  }
-  .hero-actions {
-    display: flex; gap: 16px; align-items: center;
-    opacity: 0;
-    animation: fadeUp .8s ease forwards .55s;
-  }
-  .btn-primary {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--black);
-    color: var(--white);
-    padding: 14px 28px;
-    border-radius: 100px;
-    font-size: 15px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background .25s, transform .2s;
-  }
-  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
-  .btn-secondary {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: var(--black);
-    font-size: 14px;
-    font-weight: 400;
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 2px;
-    transition: border-color .2s, color .2s;
-  }
-  .btn-secondary:hover { color: var(--accent); border-color: var(--accent); }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  .hero-scroll {
-    position: absolute; bottom: 40px; left: 48px;
-    display: flex; align-items: center; gap: 12px;
-    font-size: 12px; color: var(--mid); letter-spacing: 1px; text-transform: uppercase;
-    opacity: 0;
-    animation: fadeUp .8s ease forwards .7s;
-  }
-  .scroll-line {
-    width: 40px; height: 1px; background: var(--border);
-    position: relative; overflow: hidden;
-  }
-  .scroll-line::after {
-    content: '';
-    position: absolute; top: 0; left: -100%;
-    width: 100%; height: 100%; background: var(--accent);
-    animation: scrollLine 2s ease infinite 1s;
-  }
+    .nav-logo img {
+      height: 36px;
+      width: auto;
+    }
 
-  .stats-bar {
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 48px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0;
-  }
-  .stat {
-    padding: 0 40px;
-    border-right: 1px solid var(--border);
-  }
-  .stat:first-child { padding-left: 0; }
-  .stat:last-child { border-right: none; }
-  .stat-num {
-    font-family: var(--serif);
-    font-size: 40px;
-    letter-spacing: -1px;
-    color: var(--black);
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .stat-num em { color: var(--accent); font-style: italic; }
-  .stat-label { font-size: 13px; color: var(--mid); }
+    .nav-logo-text {
+      font-family: var(--serif);
+      font-size: 18px;
+      letter-spacing: -0.3px;
+      color: var(--accent);
+      font-style: italic;
+    }
 
-  section { padding: 100px 48px; }
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 16px;
-  }
-  .section-title {
-    font-family: var(--serif);
-    font-size: clamp(32px, 4vw, 52px);
-    letter-spacing: -1px;
-    line-height: 1.1;
-    max-width: 600px;
-    margin-bottom: 20px;
-  }
-  .section-title em { font-style: italic; color: var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
 
-  .problema {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: start;
-  }
-  .problema-left {}
-  .problema-desc {
-    font-size: 16px;
-    color: var(--mid);
-    line-height: 1.8;
-    max-width: 480px;
-  }
-  .problema-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    margin-top: 8px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  .prob-card {
-    padding: 28px 32px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    transition: background .2s;
-  }
-  .prob-card:last-child { border-bottom: none; }
-  
-  .prob-card-tag {
-    font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--mid);
-    margin-bottom: 8px;
-  }
-  .prob-card-title {
-    font-family: var(--serif);
-    font-size: 20px;
-    margin-bottom: 8px;
-  }
-  .prob-card p { font-size: 14px; color: var(--mid); line-height: 1.6; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--mid);
+      font-size: 14px;
+      font-weight: 400;
+      transition: color .2s;
+    }
 
-  .como-funciona { background: var(--black); color: var(--white); }
-  .como-funciona .section-label { color: #7c3aed; }
-  .como-funciona .section-title { color: var(--white); }
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0;
-    margin-top: 60px;
-    border: 1px solid #1e1e1e;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  .step {
-    padding: 36px 28px;
-    border-right: 1px solid #1e1e1e;
-    position: relative;
-    transition: background .25s;
-  }
-  .step:last-child { border-right: none; }
-  
-  .step-num {
-    font-family: var(--serif);
-    font-size: 48px;
-    color: #1e1e1e;
-    line-height: 1;
-    margin-bottom: 20px;
-    letter-spacing: -2px;
-  }
-  .step-icon {
-    width: 36px; height: 36px;
-    background: var(--accent);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 16px;
-    font-size: 16px;
-  }
-  .step h3 {
-    font-family: var(--serif);
-    font-size: 17px;
-    font-weight: 400;
-    margin-bottom: 10px;
-    color: var(--white);
-  }
-  .step p { font-size: 13px; color: #888; line-height: 1.6; }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
 
-  .diferenciais-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    margin-top: 60px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--border);
-  }
-  .dif-card {
-    background: var(--white);
-    padding: 40px 36px;
-    transition: background .2s;
-  }
-  
-  .dif-icon {
-    width: 44px; height: 44px;
-    background: var(--accent-light);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-  .dif-card h3 {
-    font-family: var(--serif);
-    font-size: 22px;
-    font-weight: 400;
-    margin-bottom: 12px;
-    letter-spacing: -0.3px;
-  }
-  .dif-card p { font-size: 14px; color: var(--mid); line-height: 1.7; }
+    .nav-cta {
+      background: var(--accent) !important;
+      color: #fff !important;
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      transition: background .2s !important;
+    }
 
-  .download-section {
-    background: var(--accent);
-    color: var(--white);
-    text-align: center;
-    padding: 100px 48px;
-  }
-  .download-section .section-label { color: rgba(255,255,255,0.6); }
-  .download-section .section-title { color: var(--white); margin: 0 auto 16px; }
-  .download-section .section-title em { color: rgba(255,255,255,0.7); }
-  .download-desc {
-    font-size: 16px;
-    color: rgba(255,255,255,0.75);
-    max-width: 480px;
-    margin: 0 auto 40px;
-    line-height: 1.7;
-  }
-  .download-actions {
-    display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap;
-  }
-  .btn-download {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: var(--white);
-    color: var(--accent);
-    padding: 16px 32px;
-    border-radius: 100px;
-    font-size: 15px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: transform .2s, box-shadow .2s;
-  }
-  .btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-  .btn-github {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: rgba(255,255,255,0.8);
-    font-size: 14px;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
-    padding-bottom: 2px;
-    transition: color .2s;
-  }
-  .btn-github:hover { color: white; border-color: white; }
-  .install-note {
-    margin-top: 32px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-  }
-  .install-note code {
-    background: rgba(255,255,255,0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 12px;
-  }
+    .nav-cta:hover {
+      background: var(--accent-dark) !important;
+    }
 
-  .tech-stack { border-top: 1px solid var(--border); }
-  .tech-title {
-    font-size: 12px; font-weight: 500; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--mid);
-    margin-bottom: 32px;
-  }
-  .tech-pills {
-    display: flex; flex-wrap: wrap; gap: 10px;
-  }
-  .pill {
-    padding: 8px 18px;
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    font-size: 13px;
-    color: var(--mid);
-    transition: border-color .2s, color .2s;
-  }
-  .pill:hover { border-color: var(--accent); color: var(--accent); }
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+    }
 
-  .instalacao { background: var(--black); color: var(--white); }
-  .instalacao .section-label { color: #a78bfa; }
-  .instalacao .section-title { color: var(--white); }
+    .hero::before {
+      content: \'\';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(107, 33, 168, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
-  .install-tabs {
-    display: flex; gap: 0;
-    border: 1px solid #1e1e1e;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 48px;
-  }
-  .install-tab-panel {
-    flex: 1;
-    border-right: 1px solid #1e1e1e;
-    padding: 36px 32px;
-  }
-  .install-tab-panel:last-child { border-right: none; }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .1s;
+    }
 
-  .tab-label {
-    font-size: 11px; font-weight: 500; letter-spacing: 2px;
-    text-transform: uppercase; color: #a78bfa;
-    margin-bottom: 12px;
-  }
-  .tab-title {
-    font-family: var(--serif);
-    font-size: 20px;
-    color: var(--white);
-    margin-bottom: 24px;
-    font-weight: 400;
-  }
-  .install-steps-list {
-    list-style: none;
-    display: flex; flex-direction: column; gap: 16px;
-  }
-  .install-steps-list li {
-    display: flex; gap: 14px; align-items: flex-start;
-  }
-  .step-badge {
-    width: 24px; height: 24px; min-width: 24px;
-    background: var(--accent);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 500; color: white;
-    margin-top: 1px;
-  }
-  .install-steps-list li p {
-    font-size: 14px; color: #aaa; line-height: 1.6;
-  }
-  .install-steps-list li p strong { color: #e0e0e0; font-weight: 500; }
-  .install-steps-list li code {
-    display: inline-block;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 12px;
-    color: #a78bfa;
-    margin-top: 4px;
-  }
-  .install-req {
-    margin-top: 20px;
-    padding: 14px 16px;
-    background: #111;
-    border: 1px solid #1e1e1e;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #666;
-    line-height: 1.6;
-  }
-  .install-req a {
-    color: #a78bfa;
-    text-decoration: none;
-    border-bottom: 1px solid #4c1d95;
-  }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(52px, 7vw, 96px);
+      line-height: 1.02;
+      letter-spacing: -2px;
+      max-width: 800px;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .25s;
+    }
 
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 32px 48px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  footer p { font-size: 13px; color: var(--mid); }
-  .footer-logo { font-family: var(--serif); font-size: 16px; }
-  .footer-logo span { color: var(--accent); font-style: italic; }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
 
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes scrollLine {
-    from { left: -100%; }
-    to   { left: 100%; }
-  }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--mid);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .4s;
+    }
 
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .7s ease, transform .7s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: none;
-  }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .55s;
+    }
 
-  /* VIDEO */
-  .video-section {
-    padding: 100px 48px;
-    border-top: 1px solid var(--border);
-  }
-  .video-wrapper {
-    margin-top: 48px;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    aspect-ratio: 16 / 9;
-    width: 100%;
-    background: #000;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.1);
-  }
-  .video-wrapper iframe {
-    width: 100%;
-    height: 100%;
-    display: block;
-    border: none;
-  }
-</style>
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background .25s, transform .2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--black);
+      font-size: 14px;
+      font-weight: 400;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2px;
+      transition: border-color .2s, color .2s;
+    }
+
+    .btn-secondary:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .stats-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .stat {
+      padding: 0 40px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat:first-child {
+      padding-left: 0;
+    }
+
+    .stat:last-child {
+      border-right: none;
+    }
+
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 40px;
+      letter-spacing: -1px;
+      color: var(--black);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-num em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--mid);
+    }
+
+    section {
+      padding: 100px 48px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(32px, 4vw, 52px);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    .section-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .problema {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .problema-desc {
+      font-size: 16px;
+      color: var(--mid);
+      line-height: 1.8;
+      max-width: 480px;
+    }
+
+    .problema-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .prob-card {
+      padding: 28px 32px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .prob-card:last-child {
+      border-bottom: none;
+    }
+
+    .prob-card-tag {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 8px;
+    }
+
+    .prob-card-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .prob-card p {
+      font-size: 14px;
+      color: var(--mid);
+      line-height: 1.6;
+    }
+
+    .como-funciona {
+      background: #1a0533;
+      color: #fff;
+    }
+
+    .como-funciona .section-label {
+      color: #c084fc;
+    }
+
+    .como-funciona .section-title {
+      color: #fff;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin-top: 60px;
+      border: 1px solid #2d0f50;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .step {
+      padding: 36px 28px;
+      border-right: 1px solid #2d0f50;
+    }
+
+    .step:last-child {
+      border-right: none;
+    }
+
+    .step-num {
+      font-family: var(--serif);
+      font-size: 48px;
+      color: #2d0f50;
+      line-height: 1;
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+    }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+
+    .step h3 {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 400;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .step p {
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+
+    .diferenciais-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 60px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--border);
+    }
+
+    .dif-card {
+      background: #fff;
+      padding: 40px 36px;
+    }
+
+    .dif-card h3 {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    .dif-card p {
+      font-size: 14px;
+      color: var(--mid);
+      line-height: 1.7;
+    }
+
+    .download-section {
+      background: var(--accent);
+      color: #fff;
+      text-align: center;
+      padding: 100px 48px;
+    }
+
+    .download-section .section-label {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .download-section .section-title {
+      color: #fff;
+      margin: 0 auto 16px;
+    }
+
+    .download-section .section-title em {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .download-desc {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.75);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .download-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      color: var(--accent);
+      padding: 16px 32px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .install-note {
+      margin-top: 32px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .install-note code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .instalacao {
+      background: #1a0533;
+      color: #fff;
+    }
+
+    .instalacao .section-label {
+      color: #c084fc;
+    }
+
+    .instalacao .section-title {
+      color: #fff;
+    }
+
+    .install-tabs {
+      display: flex;
+      gap: 0;
+      border: 1px solid #2d0f50;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .install-tab-panel {
+      flex: 1;
+      border-right: 1px solid #2d0f50;
+      padding: 36px 32px;
+    }
+
+    .install-tab-panel:last-child {
+      border-right: none;
+    }
+
+    .tab-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c084fc;
+      margin-bottom: 12px;
+    }
+
+    .tab-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      color: #fff;
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    .install-steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .install-steps-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .step-badge {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: white;
+      margin-top: 1px;
+    }
+
+    .install-steps-list li p {
+      font-size: 14px;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .install-steps-list li p strong {
+      color: #e0e0e0;
+      font-weight: 500;
+    }
+
+    .install-steps-list li code {
+      display: inline-block;
+      background: #0d0020;
+      border: 1px solid #2d0f50;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #c084fc;
+      margin-top: 4px;
+    }
+
+    .install-req {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: #0d0020;
+      border: 1px solid #2d0f50;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .install-req a {
+      color: #c084fc;
+      text-decoration: none;
+      border-bottom: 1px solid #4c1d95;
+    }
+
+    /* CONTACT SECTION */
+    .contato {
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 100px 48px;
+    }
+
+    .contato-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+      margin-top: 48px;
+    }
+
+    .contato-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .25s, transform .2s, box-shadow .25s;
+      background: #fff;
+    }
+
+    .contato-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(107, 33, 168, 0.1);
+    }
+
+    .contato-icon {
+      width: 52px;
+      height: 52px;
+      min-width: 52px;
+      background: var(--accent-light);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contato-icon svg {
+      color: var(--accent);
+    }
+
+    .contato-info {}
+
+    .contato-type {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 6px;
+    }
+
+    .contato-value {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--black);
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+
+    .contato-desc {
+      font-size: 13px;
+      color: var(--mid);
+    }
+
+    /* VIDEO */
+    .video-section {
+      padding: 100px 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .video-wrapper {
+      margin-top: 48px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      background: #000;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+    }
+
+    footer {
+      background: #1a0533;
+      border-top: 1px solid #2d0f50;
+      padding: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-logo img {
+      height: 32px;
+      width: auto;
+      filter: brightness(10);
+    }
+
+    .footer-logo-text {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: #c084fc;
+      font-style: italic;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 16px;
+      color: #888;
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover {
+      color: #c084fc;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .hero-div {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      justify-content: center;
+    }
+
+    .hero-image {
+     width: 100% 
+    }
+
+    .hero-image-container {
+      border-radius: 1rem;
+      aspect-ratio:16/9;
+      max-height: 400px;
+      overflow;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">Faz o <span>Libras</span></div>
-  <div class="nav-links">
-    <a href="#problema">Problema</a>
-    <a href="#demo">Demo</a>
-    <a href="#como-funciona">Como funciona</a>
-    <a href="#diferenciais">Diferenciais</a>
-    <a href="#instalacao">Instalação</a>
-    <a href="#download">Download</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <h1>Áudio do vídeo.<br>Em <em>Libras,</em><br>em tempo real.</h1>
-  <p class="hero-sub">Uma extensão de navegador que captura o áudio de qualquer aba e exibe a tradução em Libras via avatar 3D — sem pausar, sem mutar, sem barreiras.</p>
-  <div class="hero-actions">
-  </div>
-</section>
-
-<!-- PROBLEMA -->
-<section id="problema">
-  <div class="problema">
-    <div class="problema-left reveal">
-      <p class="section-label">O problema</p>
-      <h2 class="section-title">Traduzir palavra por palavra <em>não é</em> suficiente.</h2>
-      <p class="problema-desc" style="margin-top:20px">Libras não é o português escrito com as mãos. É uma língua visual-espacial com gramática própria. A maioria das soluções ignora isso — e entrega ao surdo algo incompreensível.</p>
+  <nav>
+    <div class="nav-logo">
+      <img src="imagens/logo.png" alt="LibrasLive logo">
+      <span class="nav-logo-text">LibrasLive</span>
     </div>
-    <div class="problema-cards reveal">
-      <div class="prob-card">
-        <div class="prob-card-tag">Barreira 01</div>
-        <div class="prob-card-title">Português é auditivo</div>
-        <p>Artigos, preposições e flexões verbais são "ruído" gramatical para quem usa Libras como primeira língua.</p>
+    <div class="nav-links">
+      <a href="#problema">Problema</a>
+      <a href="#demo">Demo</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#diferenciais">Diferenciais</a>
+      <a href="#contato">Contato</a>
+      <a href="#download" class="nav-cta">Download</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-div">
+      <div>
+        <p class="hero-eyebrow">Acessibilidade em tempo real</p>
+        <h1>Áudio do vídeo.<br>Em <em>Libras,</em><br>em tempo real.</h1>
+        <p class="hero-sub">Uma extensão de navegador que captura o áudio de qualquer aba e exibe a tradução em Libras
+          via
+          avatar 3D — sem pausar, sem mutar, sem barreiras.</p>
+        <div class="hero-actions">
+          <a href="https://github.com/LanneFV/Oficina_Web" class="btn-primary">
+            Ver no GitHub
+          </a>
+          <a href="#demo" class="btn-secondary">Ver demonstração →</a>
+        </div>
       </div>
-      <div class="prob-card">
-        <div class="prob-card-tag">Barreira 02</div>
-        <div class="prob-card-title">Sintaxe invertida</div>
-        <p>Libras usa a ordem Tempo → Objeto → Verbo. Tradução literal gera o chamado "Português Sinalizado", exaustivo e muitas vezes incompreensível.</p>
+
+      <div class="hero-image-container">
+        <img src="imagens/imagem_pagina_inicial.jpg" alt="" class="hero-image">
       </div>
-      <div class="prob-card">
-        <div class="prob-card-tag">Nossa solução</div>
-        <div class="prob-card-title">PLN como tradutor sintático</div>
-        <p>A IA analisa o áudio, filtra o ruído gramatical e reorganiza os termos para entregar o <em>sentido real</em> da mensagem.</p>
+
+    </div>
+  </section>
+
+  <section id="problema">
+    <div class="problema">
+      <div class="problema-left reveal">
+        <p class="section-label">O problema</p>
+        <h2 class="section-title">Traduzir palavra por palavra <em>não é</em> suficiente.</h2>
+        <p class="problema-desc" style="margin-top:20px">Libras não é o português escrito com as mãos. É uma língua
+          visual-espacial com gramática própria. A maioria das soluções ignora isso — e entrega ao surdo algo
+          incompreensível.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- COMO FUNCIONA -->
-<section class="como-funciona" id="como-funciona">
-  <p class="section-label reveal">Como funciona</p>
-  <h2 class="section-title reveal">Cinco etapas.<br>Uma experiência <em>fluida.</em></h2>
-  <div class="steps reveal">
-    <div class="step">
-      <h3>Captura de áudio</h3>
-      <p>A API Tab Capture do Chrome intercepta o fluxo de áudio da aba ativa sem mutar o som original.</p>
-    </div>
-    <div class="step">
-      <h3>Processamento</h3>
-      <p>O áudio é cortado em frações de milissegundos no AudioContext (16kHz) para não perder contexto.</p>
-    </div>
-    <div class="step">
-      <h3>WebSocket</h3>
-      <p>Os pacotes de áudio chegam ao servidor local em tempo real via conexão WebSocket de altíssima velocidade.</p>
-    </div>
-    <div class="step">
-      <h3>IA + PLN</h3>
-      <p>Vosk converte voz em texto. O módulo de PLN reestrutura a sintaxe para as regras gramaticais da Libras.</p>
-    </div>
-    <div class="step">
-      <h3>Avatar VLibras</h3>
-      <p>O widget do VLibras Gov renderiza o avatar 3D sobreposto à tela via z-index, sempre visível.</p>
-    </div>
-  </div>
-</section>
-
-<!-- DIFERENCIAIS -->
-<section id="diferenciais">
-  <p class="section-label reveal">Diferenciais</p>
-  <h2 class="section-title reveal">Por que o SignBridge<br>é <em>diferente.</em></h2>
-  <div class="diferenciais-grid reveal">
-    <div class="dif-card">
-      <h3>100% local</h3>
-      <p>O processamento acontece na sua própria máquina. Nenhum áudio é enviado para servidores externos. Sua privacidade é preservada por arquitetura.</p>
-    </div>
-    <div class="dif-card">
-      <h3>Funciona em qualquer site</h3>
-      <p>YouTube, lives, aulas online, noticiários — qualquer aba com áudio pode ser traduzida com um clique. Sem configuração extra.</p>
-    </div>
-    <div class="dif-card">
-      <h3>Gramática real de Libras</h3>
-      <p>Não é um dicionário de sinais. O PLN analisa a frase, extrai o sentido e reconstrói na sintaxe visual-espacial que o surdo realmente usa.</p>
-    </div>
-    <div class="dif-card">
-      <h3>Não intrusivo</h3>
-      <p>A extensão injeta o avatar via Content Script sem quebrar a página. O DOM original é preservado; apenas o z-index garante visibilidade.</p>
-    </div>
-    <div class="dif-card">
-      <h3>Open Source</h3>
-      <p>Código aberto, auditável e adaptável. Qualquer escola, ONG ou desenvolvedor pode instalar, modificar e evoluir o projeto.</p>
-    </div>
-    <div class="dif-card">
-      <h3>Avatar VLibras Gov</h3>
-      <p>Integrado ao player oficial do governo brasileiro — tecnologia validada, mantida e reconhecida institucionalmente.</p>
-    </div>
-  </div>
-</section>
-
-<!-- VIDEO -->
-<section class="video-section reveal" id="demo">
-  <p class="section-label">Demonstração</p>
-  <h2 class="section-title">Veja o projeto<br><em>em ação.</em></h2>
-  <div class="video-wrapper">
-    <iframe 
-    width="560" 
-    height="315" 
-    src="https://www.youtube.com/embed/gjCCYhm6paE?si=qMBu7GM1fmzulQrz" 
-    title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    referrerpolicy="strict-origin-when-cross-origin" 
-    allowfullscreen></iframe>
-  </div>
-</section>
-
-<!-- INSTALACAO -->
-<section class="instalacao" id="instalacao">
-  <p class="section-label reveal">Instalação</p>
-  <h2 class="section-title reveal">Em dois passos,<br>tudo <em>funcionando.</em></h2>
-  <div class="install-tabs reveal">
-
-    <!-- SERVIDOR PYTHON -->
-    <div class="install-tab-panel">
-      <div class="tab-label">Passo 1</div>
-      <div class="tab-title">Servidor Python</div>
-      <ul class="install-steps-list">
-        <li>
-          <div class="step-badge">1</div>
-          <p><strong>Clone o repositório e entre na pasta do servidor:</strong><br>
-          <code>cd server</code></p>
-        </li>
-        <li>
-          <div class="step-badge">2</div>
-          <p><strong>Crie e ative  um ambiente virtual:</strong><br>
-          <code>python -m venv venv</code><br>
-          <code>venv\Scripts\activate</code> <span style="color:#555">(Windows)</span></p>
-        </li>
-        <li>
-          <div class="step-badge">3</div>
-          <p><strong>Instale as dependências:</strong><br>
-          <code>pip install -r requirements.txt</code></p>
-        </li>
-        <li>
-          <div class="step-badge">4</div>
-          <p><strong>Baixe o modelo Vosk (pt-BR) e extraia em </strong><code>server/models/</code></p>
-        </li>
-        <li>
-          <div class="step-badge">5</div>
-          <p><strong>Inicie o servidor:</strong><br>
-          <code>python main.py</code></p>
-        </li>
-      </ul>
-      <div class="install-req">
-        Requer Python 3.8+. Modelo: <a href="https://alphacephei.com/vosk/models" target="_blank">vosk-model-small-pt-0.3</a>
+      <div class="problema-cards reveal">
+        <div class="prob-card">
+          <div class="prob-card-tag">Barreira 01</div>
+          <div class="prob-card-title">Português é auditivo</div>
+          <p>Artigos, preposições e flexões verbais são "ruído" gramatical para quem usa Libras como primeira língua.
+          </p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-card-tag">Barreira 02</div>
+          <div class="prob-card-title">Sintaxe invertida</div>
+          <p>Libras usa a ordem Tempo → Objeto → Verbo. Tradução literal gera o chamado "Português Sinalizado",
+            exaustivo e muitas vezes incompreensível.</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-card-tag">Nossa solução</div>
+          <div class="prob-card-title">PLN como tradutor sintático</div>
+          <p>A IA analisa o áudio, filtra o ruído gramatical e reorganiza os termos para entregar o <em>sentido
+              real</em> da mensagem.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- EXTENSAO CHROME -->
-    <div class="install-tab-panel">
-      <div class="tab-label">Passo 2</div>
-      <div class="tab-title">Extensão no Chrome</div>
-      <ul class="install-steps-list">
-        <li>
-          <div class="step-badge">1</div>
-          <p><strong>Abra  o gerenciador de extensões do Chrome:</strong><br>
-          <code>chrome://extensions</code></p>
-        </li>
-        <li>
-          <div class="step-badge">2</div>
-          <p><strong>Ativeo Modo do desenvolvedor no canto superior direito.</strong></p>
-        </li>
-        <li>
-          <div class="step-badge">3</div>
-          <p><strong>Clique em "Carregar sem compactação" e selecione a pasta </strong><code>extensao/</code> do repositório.</p>
-        </li>
-        <li>
-          <div class="step-badge">4</div>
-          <p><strong>Com o servidor rodando, abra qualquer aba com vídeo e clique no ícone da extensão para iniciar.</strong></p>
-        </li>
-      </ul>
-      <div class="install-req">
-        Compatível com Google Chrome e navegadores baseados em Chromium (Edge, Brave).
+  <section class="como-funciona" id="como-funciona">
+    <p class="section-label reveal">Como funciona</p>
+    <h2 class="section-title reveal">Cinco etapas.<br>Uma experiência <em>fluida.</em></h2>
+    <div class="steps reveal">
+      <div class="step">
+        <h3>Captura de áudio</h3>
+        <p>A API Tab Capture do Chrome intercepta o fluxo de áudio da aba ativa sem mutar o som original.</p>
+      </div>
+      <div class="step">
+        <h3>Processamento</h3>
+        <p>O áudio é cortado em frações de milissegundos no AudioContext (16kHz) para não perder contexto.</p>
+      </div>
+      <div class="step">
+        <h3>WebSocket</h3>
+        <p>Os pacotes de áudio chegam ao servidor local em tempo real via conexão WebSocket de altíssima velocidade.</p>
+      </div>
+      <div class="step">
+        <h3>IA + PLN</h3>
+        <p>Vosk converte voz em texto. O módulo de PLN reestrutura a sintaxe para as regras gramaticais da Libras.</p>
+      </div>
+      <div class="step">
+        <h3>Avatar VLibras</h3>
+        <p>O widget do VLibras Gov renderiza o avatar 3D sobreposto à tela via z-index, sempre visível.</p>
       </div>
     </div>
+  </section>
 
-  </div>
-</section>
+  <section id="diferenciais">
+    <p class="section-label reveal">Diferenciais</p>
+    <h2 class="section-title reveal">Por que o SignBridge<br>é <em>diferente.</em></h2>
+    <div class="diferenciais-grid reveal">
+      <div class="dif-card">
+        <h3>100% local</h3>
+        <p>O processamento acontece na sua própria máquina. Nenhum áudio é enviado para servidores externos. Sua
+          privacidade é preservada por arquitetura.</p>
+      </div>
+      <div class="dif-card">
+        <h3>Funciona em qualquer site</h3>
+        <p>YouTube, lives, aulas online, noticiários — qualquer aba com áudio pode ser traduzida com um clique. Sem
+          configuração extra.</p>
+      </div>
+      <div class="dif-card">
+        <h3>Gramática real de Libras</h3>
+        <p>Não é um dicionário de sinais. O PLN analisa a frase, extrai o sentido e reconstrói na sintaxe
+          visual-espacial que o surdo realmente usa.</p>
+      </div>
+      <div class="dif-card">
+        <h3>Não intrusivo</h3>
+        <p>A extensão injeta o avatar via Content Script sem quebrar a página. O DOM original é preservado; apenas o
+          z-index garante visibilidade.</p>
+      </div>
+      <div class="dif-card">
+        <h3>Open Source</h3>
+        <p>Código aberto, auditável e adaptável. Qualquer escola, ONG ou desenvolvedor pode instalar, modificar e
+          evoluir o projeto.</p>
+      </div>
+      <div class="dif-card">
+        <h3>Avatar VLibras Gov</h3>
+        <p>Integrado ao player oficial do governo brasileiro — tecnologia validada, mantida e reconhecida
+          institucionalmente.</p>
+      </div>
+    </div>
+  </section>
 
-<!-- DOWNLOAD -->
-<section class="download-section" id="download">
-  <p class="section-label">Download gratuito</p>
-  <h2 class="section-title">Pronto para<br><em>começar?</em></h2>
-  <p class="download-desc">Baixe a extensão, aponte para a pasta no Chrome e inicie o servidor Python. Em menos de dois minutos está funcionando.</p>
-  <div class="download-actions">
-    <a href="https://github.com/LanneFV/Oficina_Web" class="btn-download">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Ver no GitHub
-    </a>
-  </div>
-  <p class="install-note">
-    Após baixar: <code>chrome://extensions</code> → Modo desenvolvedor → Carregar sem compactação
-  </p>
-</section>
+  <section class="video-section reveal" id="demo">
+    <p class="section-label">Demonstração</p>
+    <h2 class="section-title">Veja o projeto<br><em>em ação.</em></h2>
+    <div class="video-wrapper">
+      <iframe src="https://www.youtube.com/embed/gjCCYhm6paE?si=qMBu7GM1fmzulQrz" title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+  </section>
 
-<script>
-  // Scroll reveal
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 80);
-      }
-    });
-  }, { threshold: 0.1 });
+  <section class="instalacao" id="instalacao">
+    <p class="section-label reveal">Instalação</p>
+    <h2 class="section-title reveal">Em dois passos,<br>tudo <em>funcionando.</em></h2>
+    <div class="install-tabs reveal">
+      <div class="install-tab-panel">
+        <div class="tab-label">Passo 1</div>
+        <div class="tab-title">Servidor Python</div>
+        <ul class="install-steps-list">
+          <li>
+            <div class="step-badge">1</div>
+            <p><strong>Clone o repositório e entre na pasta do servidor:</strong><br><code>cd server</code></p>
+          </li>
+          <li>
+            <div class="step-badge">2</div>
+            <p><strong>Crie e ative um ambiente
+                virtual:</strong><br><code>python -m venv venv</code><br><code>venv\\Scripts\\activate</code></p>
+          </li>
+          <li>
+            <div class="step-badge">3</div>
+            <p><strong>Instale as dependências:</strong><br><code>pip install -r requirements.txt</code></p>
+          </li>
+          <li>
+            <div class="step-badge">4</div>
+            <p><strong>Baixe o modelo Vosk (pt-BR) e extraia em</strong> <code>server/models/</code></p>
+          </li>
+          <li>
+            <div class="step-badge">5</div>
+            <p><strong>Inicie o servidor:</strong><br><code>python main.py</code></p>
+          </li>
+        </ul>
+        <div class="install-req">Requer Python 3.8+. Modelo: <a href="https://alphacephei.com/vosk/models"
+            target="_blank">vosk-model-small-pt-0.3</a></div>
+      </div>
+      <div class="install-tab-panel">
+        <div class="tab-label">Passo 2</div>
+        <div class="tab-title">Extensão no Chrome</div>
+        <ul class="install-steps-list">
+          <li>
+            <div class="step-badge">1</div>
+            <p><strong>Abra o gerenciador de extensões do Chrome:</strong><br><code>chrome://extensions</code></p>
+          </li>
+          <li>
+            <div class="step-badge">2</div>
+            <p><strong>Ative o Modo do desenvolvedor no canto superior direito.</strong></p>
+          </li>
+          <li>
+            <div class="step-badge">3</div>
+            <p><strong>Clique em "Carregar sem compactação" e selecione a pasta</strong> <code>extensao/</code></p>
+          </li>
+          <li>
+            <div class="step-badge">4</div>
+            <p><strong>Com o servidor rodando, abra qualquer aba com vídeo e clique no ícone da extensão.</strong></p>
+          </li>
+        </ul>
+        <div class="install-req">Compatível com Google Chrome e navegadores baseados em Chromium (Edge, Brave).</div>
+      </div>
+    </div>
+  </section>
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
+  <!-- CONTATO -->
+  <section class="contato" id="contato">
+    <p class="section-label reveal">Fale conosco</p>
+    <h2 class="section-title reveal">Entre em <em>contato.</em></h2>
+    <div class="contato-grid reveal">
+      <a href="https://www.instagram.com/libras.live/" target="_blank" class="contato-card">
+        <div class="contato-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <div class="contato-info">
+          <div class="contato-type">Instagram</div>
+          <div class="contato-value">@libras.live</div>
+          <div class="contato-desc">Siga-nos para novidades, demos e atualizações do projeto.</div>
+        </div>
+      </a>
+      <a href="tel:+5561998669830" class="contato-card">
+        <div class="contato-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path
+              d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+          </svg>
+        </div>
+        <div class="contato-info">
+          <div class="contato-type">Telefone / WhatsApp</div>
+          <div class="contato-value">(61) 99866-9830</div>
+          <div class="contato-desc">Disponível para parcerias, dúvidas técnicas e suporte.</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="download-section" id="download">
+    <p class="section-label">Download gratuito</p>
+    <h2 class="section-title">Pronto para<br><em>começar?</em></h2>
+    <p class="download-desc">Baixe a extensão, aponte para a pasta no Chrome e inicie o servidor Python. Em menos de
+      dois minutos está funcionando.</p>
+    <div class="download-actions">
+      <a href="https://github.com/LanneFV/Oficina_Web" class="btn-download">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+          <polyline points="7,10 12,15 17,10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Ver no GitHub
+      </a>
+    </div>
+    <p class="install-note">Após baixar: <code>chrome://extensions</code> → Modo desenvolvedor → Carregar sem
+      compactação</p>
+  </section>
+
+  <footer>
+    <div class="footer-logo">
+      <img src="data:image/png;base64,LOGO_B64" alt="LibrasLive">
+      <span class="footer-logo-text">LibrasLive</span>
+    </div>
+    <p>© 2026 LibrasLive. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal')
+      .forEach(el => observer.observe(el));
+  </script>
 </body>
+
 </html>
